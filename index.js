@@ -50,7 +50,6 @@ client.on(Events.InteractionCreate, async interaction => {
 
   } else if (commandName === 'pay') {
 
-
     let userId = interaction.user.id;
     let amount = Math.abs(interaction.options.getNumber('amount'));
 
@@ -75,9 +74,7 @@ client.on(Events.InteractionCreate, async interaction => {
         await interaction.reply(`Paid user <@${recipient}> ${amount} ${value(amount)}.`);
 
       } else {
-
         await interaction.reply('This user doesn\'t have an account. Tell them to run /balance.');
-
       }
     }
   } else if (commandName === 'gamble') {
@@ -109,23 +106,18 @@ client.on(Events.InteractionCreate, async interaction => {
           db.prepare('UPDATE users SET balance = balance - ? WHERE user_id = ?').run(amount, userId);
 
         }
-
       } else {
-
         await interaction.reply("The house doesn't have enough tokens to go through with this bet.");
-
       }
     } else {
-
       await interaction.reply("You don't have enough tokens to go through with this bet.");
-
     }
 
-
-
   } else if (commandName === 'house') {
+    
     let balance = db.prepare('SELECT balance FROM users WHERE user_id = ?').get('house');
     await interaction.reply(`The balance of the house is ${balance.balance} tokens.`);
+    
   } else if (commandName === 'leaderboard') {
 
     let leaderboard = '';
@@ -138,49 +130,31 @@ client.on(Events.InteractionCreate, async interaction => {
     `).all();
 
     for (let i = 0; i < topUsers.length; i++) {
-
       let mention = '';
-
       if (!(topUsers[i].user_id === 'house')) {
-
-        mention = `<@${topUsers[i].user_id}>`;
-
+        mention = (await client.users.fetch(topUsers[i].user_id)).username;
       } else {
-
         mention = 'House';
-
       }
-      leaderboard += `${mention}: ${Number(topUsers[i].balance).toFixed(2)} \n`;
+      leaderboard += `**${mention}**: ${Math.round(Number(topUsers[i].balance))} \n`;
     }
-
-
+    
     let embed = new EmbedBuilder()
       .setTitle('Top Users By Tokens')
       .setDescription(leaderboard)
       .setTimestamp()
 
     await interaction.reply({ embeds: [embed] });
-
   }
-
-  
-
 });
 
 
 client.once(Events.ClientReady, readyClient => {
-
   console.log(`Ready on ${readyClient.user.tag}`);
-
   client.user.setPresence({
     activities: [{ name: activities[Math.floor(Math.random() * activities.length)], type: 4 }],
     status: 'online',
   });
-
 });
 
 client.login(token);
-
-
-
-
