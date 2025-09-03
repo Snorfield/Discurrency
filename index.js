@@ -27,7 +27,7 @@ let activities = [
 ];
 
 const client = new Client({
-  intents: []
+  intents: [GatewayIntentBits.Guilds]
 });
 
 client.on(Events.InteractionCreate, async interaction => {
@@ -180,5 +180,7 @@ client.once(Events.ClientReady, readyClient => {
 });
 
 client.login(token);
+
+
 
 
