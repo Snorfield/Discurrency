@@ -182,7 +182,3 @@ client.once(Events.ClientReady, readyClient => {
 client.login(token);
 
 
-});
-
-client.login(token);
-
