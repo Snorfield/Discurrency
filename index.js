@@ -27,11 +27,7 @@ let activities = [
 ];
 
 const client = new Client({
-  intents: [
-    GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent
-  ]
+  intents: []
 });
 
 client.on(Events.InteractionCreate, async interaction => {
@@ -184,3 +180,9 @@ client.once(Events.ClientReady, readyClient => {
 });
 
 client.login(token);
+
+
+});
+
+client.login(token);
+
