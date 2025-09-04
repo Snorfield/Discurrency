@@ -135,7 +135,7 @@ client.on(Events.InteractionCreate, async interaction => {
 
       for (let i = 0; i < userShops.length; i++) {
         let item = userShops[i];
-        text += `**#${item.id} - ${item.service}**\n*${item.price} Tokens*\n${item.description}\n\n`;
+        text += `**#${item.id} - ${item.service}**\n*${item.price} ${value(price)}*\n${item.description}\n\n`;
       }
 
       let mention = (await client.users.fetch(target)).username;
@@ -156,6 +156,8 @@ client.on(Events.InteractionCreate, async interaction => {
   } else if (commandName === 'create-product') {
 
     let userId = interaction.user.id;
+    
+    economy.prepare('INSERT OR IGNORE INTO users (user_id, balance) VALUES (?, 100)').run(userId);
 
     let userShops = economy.prepare('SELECT * FROM shops WHERE user_id = ?').all(userId);
 
@@ -174,7 +176,7 @@ client.on(Events.InteractionCreate, async interaction => {
 
       economy.prepare(`INSERT INTO shops (user_id, service, description, price) VALUES (?, ?, ?, ?);`).run(userId, product, description, price);
 
-      let text = `**${product}**\n*${price} Tokens*\n${description}`;
+      let text = `**${product}**\n*${price} ${value(price)}*\n${description}`;
 
       let embed = new EmbedBuilder()
         .setTitle(`Product Successfully Created`)
