@@ -79,11 +79,7 @@ const rest = new REST({ version: '10' }).setToken(token);
     try {
 
         console.log('Started refreshing application (/) commands.');
-
-        await rest.put(Routes.applicationCommands(clientId, guildId), { body: [] });
-
-        console.log('Successfully deleted all application (/) commands.');
-
+        
         await rest.put(Routes.applicationCommands(clientId, guildId), { body: commands });
 
         console.log('Successfully reloaded application (/) commands.');
@@ -92,5 +88,6 @@ const rest = new REST({ version: '10' }).setToken(token);
         console.error(error);
     }
 })();
+
 
 
