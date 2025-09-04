@@ -135,7 +135,7 @@ client.on(Events.InteractionCreate, async interaction => {
 
       for (let i = 0; i < userShops.length; i++) {
         let item = userShops[i];
-        text += `**#${item.id} - ${item.service}**\n*${item.price} ${value(price)}*\n${item.description}\n\n`;
+        text += `**#${item.id} - ${item.service}**\n*${item.price} ${value(item.price)}*\n${item.description}\n\n`;
       }
 
       let mention = (await client.users.fetch(target)).username;
@@ -260,4 +260,5 @@ client.once(Events.ClientReady, readyClient => {
 });
 
 client.login(token);
+
 
