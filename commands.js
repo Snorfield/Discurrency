@@ -44,11 +44,15 @@ const commands = [
         .addStringOption(option =>
             option.setName('product')
                 .setDescription('Name of the product')
+                .setMaxLength(100) 
+                .setMinLength(1) 
                 .setRequired(true)
         )
         .addStringOption(option =>
             option.setName('description')
                 .setDescription('Description for the product')
+                .setMaxLength(100) 
+                .setMinLength(1) 
                 .setRequired(true)
         )
         .addNumberOption(option =>
@@ -88,6 +92,3 @@ const rest = new REST({ version: '10' }).setToken(token);
         console.error(error);
     }
 })();
-
-
-
