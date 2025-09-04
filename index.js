@@ -161,9 +161,9 @@ client.on(Events.InteractionCreate, async interaction => {
 
     let userShops = economy.prepare('SELECT * FROM shops WHERE user_id = ?').all(userId);
 
-    if (userShops.length >= 4) {
+    if (userShops.length >= 8) {
       let embed = new EmbedBuilder()
-        .setDescription(":x: You have the limit of four products in your shop, please remove some to add this product.")
+        .setDescription(":x: You have the limit of eight products in your shop, please remove some to add this product.")
 
       await interaction.reply({ embeds: [embed] });
 
@@ -260,3 +260,4 @@ client.once(Events.ClientReady, readyClient => {
 });
 
 client.login(token);
+
