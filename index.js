@@ -151,7 +151,7 @@ client.on(Events.InteractionCreate, async interaction => {
 
       let product = interaction.options.getString('product');
       let description = interaction.options.getString('description');
-      let price = Math.abs(interaction.options.getNumber('price'));
+      let price = abs(interaction.options.getNumber('price'));
 
       economy.prepare(`INSERT INTO shops (user_id, service, description, price) VALUES (?, ?, ?, ?);`).run(userId, product, description, price);
 
@@ -179,6 +179,37 @@ client.on(Events.InteractionCreate, async interaction => {
       await interaction.reply("You don't own a product listing with that id!");
     }
 
+  } else if (commandName === 'buy') {
+
+    let userId = interaction.user.id;
+
+    economy.prepare('INSERT OR IGNORE INTO users (user_id, balance) VALUES (?, 100)').run(userId);
+
+    let balance = economy.prepare('SELECT balance FROM users WHERE user_id = ?').get(userId).balance;
+
+    let targetUserShop = interaction.options.getUser('user').id;
+
+    let targetShopId = interaction.options.getNumber('id');
+
+    let product = economy.prepare('SELECT * FROM shops WHERE id = ? AND user_id = ?').get(targetShopId, targetUserShop);
+
+    if (product) {
+
+      if (balance >= product.price) {
+
+        economy.prepare('UPDATE users SET balance = balance - ? WHERE user_id = ?').run(product.price, userId);
+        economy.prepare('UPDATE users SET balance = balance + ? WHERE user_id = ?').run(product.price, targetUserShop);
+
+        await interaction.reply(`Your purchase of ${product.service} from <@${targetUserShop}> has gone through successfully.`);
+
+      } else {
+        await interaction.reply("You don't have enough tokens to buy this product.")
+      }
+
+
+    } else {
+      await interaction.reply("Either this user doesn't have any products, or they don't have one with that id.");
+    }
   }
 });
 
@@ -192,4 +223,6 @@ client.once(Events.ClientReady, readyClient => {
 });
 
 client.login(token);
+
+
 
