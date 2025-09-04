@@ -14,7 +14,6 @@ db.prepare(`
   )
 `).run();
 
-db.prepare('INSERT OR IGNORE INTO users (user_id, balance) VALUES (?, ?)').run('house', 1000000000000000);
 
 // General discord bot setup (annoying)
 
@@ -76,48 +75,7 @@ client.on(Events.InteractionCreate, async interaction => {
       } else {
         await interaction.reply('This user doesn\'t have an account. Tell them to run /balance.');
       }
-    }
-  } else if (commandName === 'gamble') {
-
-    let userId = interaction.user.id;
-
-    let amount = Math.abs(interaction.options.getNumber('amount'));
-
-    db.prepare('INSERT OR IGNORE INTO users (user_id, balance) VALUES (?, 100)').run(userId);
-
-    let house = db.prepare('SELECT balance FROM users WHERE user_id = ?').get('house').balance;
-    let user = db.prepare('SELECT balance FROM users WHERE user_id = ?').get(userId).balance;
-
-    if (user >= amount) {
-      if (house >= amount) {
-
-        let chance = Math.floor(Math.random() * 100);
-
-        if (chance < 51) {
-
-          await interaction.reply(`You won ${amount} ${value(amount)}!`);
-          db.prepare('UPDATE users SET balance = balance - ? WHERE user_id = ?').run(amount, 'house');
-          db.prepare('UPDATE users SET balance = balance + ? WHERE user_id = ?').run(amount, userId);
-
-        } else {
-
-          await interaction.reply(`You lost ${amount} ${value(amount)}. The house has gained it.`);
-          db.prepare('UPDATE users SET balance = balance + ? WHERE user_id = ?').run(amount, 'house');
-          db.prepare('UPDATE users SET balance = balance - ? WHERE user_id = ?').run(amount, userId);
-
-        }
-      } else {
-        await interaction.reply("The house doesn't have enough tokens to go through with this bet.");
-      }
-    } else {
-      await interaction.reply("You don't have enough tokens to go through with this bet.");
-    }
-
-  } else if (commandName === 'house') {
-    
-    let balance = db.prepare('SELECT balance FROM users WHERE user_id = ?').get('house');
-    await interaction.reply(`The balance of the house is ${balance.balance} tokens.`);
-    
+    }  
   } else if (commandName === 'leaderboard') {
 
     let leaderboard = '';
@@ -130,12 +88,9 @@ client.on(Events.InteractionCreate, async interaction => {
     `).all();
 
     for (let i = 0; i < topUsers.length; i++) {
-      let mention = '';
-      if (!(topUsers[i].user_id === 'house')) {
-        mention = (await client.users.fetch(topUsers[i].user_id)).username;
-      } else {
-        mention = 'House';
-      }
+      
+      let mention = (await client.users.fetch(topUsers[i].user_id)).username;
+
       leaderboard += `**${mention}**: ${Math.round(Number(topUsers[i].balance))} \n`;
     }
     
