@@ -151,7 +151,7 @@ client.on(Events.InteractionCreate, async interaction => {
 
       let product = interaction.options.getString('product');
       let description = interaction.options.getString('description');
-      let price = abs(interaction.options.getNumber('price'));
+      let price = Math.abs(interaction.options.getNumber('price'));
 
       economy.prepare(`INSERT INTO shops (user_id, service, description, price) VALUES (?, ?, ?, ?);`).run(userId, product, description, price);
 
@@ -223,6 +223,7 @@ client.once(Events.ClientReady, readyClient => {
 });
 
 client.login(token);
+
 
 
 
