@@ -44,14 +44,14 @@ const commands = [
         .addStringOption(option =>
             option.setName('product')
                 .setDescription('Name of the product')
-                .setMaxLength(250) 
+                .setMaxLength(200) 
                 .setMinLength(1) 
                 .setRequired(true)
         )
         .addStringOption(option =>
             option.setName('description')
                 .setDescription('Description for the product')
-                .setMaxLength(250) 
+                .setMaxLength(200) 
                 .setMinLength(1) 
                 .setRequired(true)
         )
@@ -70,6 +70,21 @@ const commands = [
                 .setDescription('ID of the product to remove')
                 .setRequired(true)
         )
+        .toJSON(),
+
+    new SlashCommandBuilder()
+        .setName('buy')
+        .setDescription('Buy a product from a user\'s shop.')
+        .addUserOption(option =>
+            option.setName('user')
+                .setDescription('User shop to buy from')
+                .setRequired(true)
+        )
+        .addNumberOption(option =>
+            option.setName('id')
+                .setDescription('ID of product to buy')
+                .setRequired(true)
+        )
         .toJSON()
 ];
 
@@ -79,7 +94,7 @@ const rest = new REST({ version: '10' }).setToken(token);
     try {
 
         console.log('Started refreshing application (/) commands.');
-        
+
         await rest.put(Routes.applicationCommands(clientId, guildId), { body: commands });
 
         console.log('Successfully reloaded application (/) commands.');
@@ -88,6 +103,3 @@ const rest = new REST({ version: '10' }).setToken(token);
         console.error(error);
     }
 })();
-
-
-
