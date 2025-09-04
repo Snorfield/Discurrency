@@ -26,6 +26,46 @@ const commands = [
     new SlashCommandBuilder()
         .setName('leaderboard')
         .setDescription('View the global token leaderboard')
+        .toJSON(),
+
+    new SlashCommandBuilder()
+        .setName('shop')
+        .setDescription('View a user\'s shop')
+        .addUserOption(option =>
+            option.setName('user')
+                .setDescription('Shop owner')
+                .setRequired(true)
+        )
+        .toJSON(),
+
+    new SlashCommandBuilder()
+        .setName('create-product')
+        .setDescription('Create a product for your shop')
+        .addStringOption(option =>
+            option.setName('product')
+                .setDescription('Name of the product')
+                .setRequired(true)
+        )
+        .addStringOption(option =>
+            option.setName('description')
+                .setDescription('Description for the product')
+                .setRequired(true)
+        )
+        .addNumberOption(option =>
+            option.setName('price')
+                .setDescription('Price for the product')
+                .setRequired(true)
+        )
+        .toJSON(),
+
+    new SlashCommandBuilder()
+        .setName('remove-product')
+        .setDescription('Remove a product from your shop')
+        .addNumberOption(option =>
+            option.setName('id')
+                .setDescription('ID of the product to remove')
+                .setRequired(true)
+        )
         .toJSON()
 ];
 
@@ -36,11 +76,11 @@ const rest = new REST({ version: '10' }).setToken(token);
 
         console.log('Started refreshing application (/) commands.');
 
-        await rest.put(Routes.applicationCommands(clientId), { body: [] });
+        await rest.put(Routes.applicationCommands(clientId, guildId), { body: [] });
 
         console.log('Successfully deleted all application (/) commands.');
 
-        await rest.put(Routes.applicationCommands(clientId), { body: commands });
+        await rest.put(Routes.applicationCommands(clientId, guildId), { body: commands });
 
         console.log('Successfully reloaded application (/) commands.');
 
@@ -48,4 +88,6 @@ const rest = new REST({ version: '10' }).setToken(token);
         console.error(error);
     }
 })();
+
+
 
