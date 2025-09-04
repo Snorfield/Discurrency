@@ -24,21 +24,6 @@ const commands = [
         .toJSON(),
 
     new SlashCommandBuilder()
-        .setName('gamble')
-        .setDescription('50/50 chance to win the amount you gambled, if you lose, it\'s added into the house.')
-        .addNumberOption(option =>
-            option.setName('amount')
-                .setDescription('Amount to gamble')
-                .setRequired(true)
-        )
-        .toJSON(),
-
-    new SlashCommandBuilder()
-        .setName('house')
-        .setDescription('View the balance of the house')
-        .toJSON(),
-    
-    new SlashCommandBuilder()
         .setName('leaderboard')
         .setDescription('View the global token leaderboard')
         .toJSON()
@@ -63,3 +48,4 @@ const rest = new REST({ version: '10' }).setToken(token);
         console.error(error);
     }
 })();
+
