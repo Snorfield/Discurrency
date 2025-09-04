@@ -57,7 +57,10 @@ client.on(Events.InteractionCreate, async interaction => {
 
     let balance = row.balance;
 
-    await interaction.reply(`Your current balance is ${balance} ${value(balance)}.`);
+    let embed = new EmbedBuilder()
+      .setDescription(`Your current balance is **${balance}** ${value(balance)}.`)
+
+    await interaction.reply({ embeds: [embed] });
 
   } else if (commandName === 'pay') {
 
@@ -70,7 +73,10 @@ client.on(Events.InteractionCreate, async interaction => {
 
     if ((balance.balance - amount) < 0) {
 
-      await interaction.reply('You don\'t have enough tokens to make this transfer.');
+      let embed = new EmbedBuilder()
+        .setDescription(':x: You don\'t have enough tokens to make this transfer.')
+
+      await interaction.reply({ embeds: [embed] });
 
     } else {
 
@@ -82,10 +88,16 @@ client.on(Events.InteractionCreate, async interaction => {
         economy.prepare('UPDATE users SET balance = balance - ? WHERE user_id = ?').run(amount, userId);
         economy.prepare('UPDATE users SET balance = balance + ? WHERE user_id = ?').run(amount, recipient);
 
-        await interaction.reply(`Paid user <@${recipient}> ${amount} ${value(amount)}.`);
+        let embed = new EmbedBuilder()
+          .setDescription(`:white_check_mark: Paid user <@${recipient}> **${amount}** ${value(amount)}.`)
+
+        await interaction.reply({ embeds: [embed] });
 
       } else {
-        await interaction.reply('This user doesn\'t have an account. Tell them to run /balance.');
+        let embed = new EmbedBuilder()
+          .setDescription(":x: This user doesn\'t have an account. Tell them to run /balance.")
+
+        await interaction.reply({ embeds: [embed] });
       }
     }
   } else if (commandName === 'leaderboard') {
@@ -135,7 +147,10 @@ client.on(Events.InteractionCreate, async interaction => {
 
       await interaction.reply({ embeds: [embed] });
     } else {
-      await interaction.reply("This user doesn't have any shops!")
+      let embed = new EmbedBuilder()
+        .setDescription(":x: This user doesn't have any shops!")
+
+      await interaction.reply({ embeds: [embed] });
     }
 
   } else if (commandName === 'create-product') {
@@ -145,7 +160,11 @@ client.on(Events.InteractionCreate, async interaction => {
     let userShops = economy.prepare('SELECT * FROM shops WHERE user_id = ?').all(userId);
 
     if (userShops.length >= 4) {
-      await interaction.reply("You have the limit of four products in your shop, please remove some to add this product.");
+      let embed = new EmbedBuilder()
+        .setDescription(":x: You have the limit of four products in your shop, please remove some to add this product.")
+
+      await interaction.reply({ embeds: [embed] });
+
     } else {
       economy.prepare('INSERT OR IGNORE INTO users (user_id, balance) VALUES (?, 100)').run(userId);
 
@@ -174,9 +193,15 @@ client.on(Events.InteractionCreate, async interaction => {
 
     if (product) {
       economy.prepare('DELETE FROM shops WHERE id = ? AND user_id = ?').run(productId, userId);
-      await interaction.reply("Product successfully removed from your shop.");
+      let embed = new EmbedBuilder()
+        .setDescription(":white_check_mark: Product successfully removed from your shop.")
+
+      await interaction.reply({ embeds: [embed] });
     } else {
-      await interaction.reply("You don't own a product listing with that id!");
+      let embed = new EmbedBuilder()
+        .setDescription(":x: You don't own a product listing with that id!")
+
+      await interaction.reply({ embeds: [embed] });
     }
 
   } else if (commandName === 'buy') {
@@ -200,15 +225,25 @@ client.on(Events.InteractionCreate, async interaction => {
         economy.prepare('UPDATE users SET balance = balance - ? WHERE user_id = ?').run(product.price, userId);
         economy.prepare('UPDATE users SET balance = balance + ? WHERE user_id = ?').run(product.price, targetUserShop);
 
-        await interaction.reply(`Your purchase of ${product.service} from <@${targetUserShop}> has gone through successfully.`);
+        let embed = new EmbedBuilder()
+          .setDescription(`:white_check_mark: Your purchase of **${product.service}** from <@${targetUserShop}> has gone through successfully.`)
+
+        await interaction.reply({ content: `<@${targetUserShop}>`, embeds: [embed] });
 
       } else {
-        await interaction.reply("You don't have enough tokens to buy this product.")
+
+        let embed = new EmbedBuilder()
+          .setDescription(":x: You don't have enough tokens to buy this product.")
+
+        await interaction.reply({ embeds: [embed] });
       }
 
 
     } else {
-      await interaction.reply("Either this user doesn't have any products, or they don't have one with that id.");
+      let embed = new EmbedBuilder()
+        .setDescription(":x: Either this user doesn't have any products, or they don't have one with that id.")
+
+      await interaction.reply({ embeds: [embed] });
     }
   }
 });
@@ -223,7 +258,3 @@ client.once(Events.ClientReady, readyClient => {
 });
 
 client.login(token);
-
-
-
-
