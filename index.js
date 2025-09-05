@@ -215,6 +215,7 @@ client.on(Events.InteractionCreate, async interaction => {
   } else if (commandName === 'buy') {
 
     let userId = interaction.user.id;
+    let userName = interaction.user.username;
 
     economy.prepare('INSERT OR IGNORE INTO users (user_id, balance) VALUES (?, 100)').run(userId);
 
@@ -243,7 +244,7 @@ client.on(Events.InteractionCreate, async interaction => {
 
 
         let sellerEmbed = new EmbedBuilder()
-          .setDescription(`<@${userId}> (${targetUserName}) has purchased **${product.service}** from you. **+${product.price}** ${value(product.price)}`);
+          .setDescription(`<@${userId}> (${userName}) has purchased **${product.service}** from you. **+${product.price}** ${value(product.price)}`);
 
         await interaction.deferReply();
 
@@ -340,3 +341,4 @@ client.once(Events.ClientReady, readyClient => {
 });
 
 client.login(token);
+
