@@ -138,7 +138,7 @@ client.on(Events.InteractionCreate, async interaction => {
         text += `**#${item.id} - ${item.service}**\n*${item.price} ${value(item.price)}*\n${item.description}\n\n`;
       }
 
-      let mention = (await client.users.fetch(target)).username;
+      let mention = (await client.users.fetch(target)).username;
 
       let embed = new EmbedBuilder()
         .setTitle(`${mention}'s Shop`)
