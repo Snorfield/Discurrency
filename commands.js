@@ -7,6 +7,11 @@ const commands = [
         .setName('balance')
         .setDescription('Get your current balance')
         .toJSON(),
+    
+    new SlashCommandBuilder()
+        .setName('statistics')
+        .setDescription('View the statistics of the economy')
+        .toJSON(),
 
     new SlashCommandBuilder()
         .setName('pay')
@@ -74,7 +79,7 @@ const commands = [
 
     new SlashCommandBuilder()
         .setName('buy')
-        .setDescription('Buy a product from a user\'s shop.')
+        .setDescription('Buy a product from a user\'s shop')
         .addUserOption(option =>
             option.setName('user')
                 .setDescription('User shop to buy from')
@@ -115,6 +120,7 @@ const commands = [
                 .setRequired(false)
         )
         .toJSON()
+        
 ];
 
 const rest = new REST({ version: '10' }).setToken(token);
