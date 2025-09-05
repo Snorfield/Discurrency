@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, REST, Routes } = require('discord.js');
-const { token, clientId } = require('./config.json');
+const { token, clientId, guildId } = require('./config.json');
 
 const commands = [
 
@@ -85,6 +85,35 @@ const commands = [
                 .setDescription('ID of product to buy')
                 .setRequired(true)
         )
+        .toJSON(),
+
+    new SlashCommandBuilder()
+        .setName('edit-product')
+        .setDescription('Edit a product from your shop')
+        .addNumberOption(option =>
+            option.setName('id')
+                .setDescription('Id of the product to edit')
+                .setRequired(true)
+        )
+        .addStringOption(option =>
+            option.setName('product')
+                .setDescription('New name of the product')
+                .setMaxLength(200) 
+                .setMinLength(1) 
+                .setRequired(false)
+        )
+        .addStringOption(option =>
+            option.setName('description')
+                .setDescription('New description for the product')
+                .setMaxLength(200) 
+                .setMinLength(1) 
+                .setRequired(false)
+        )
+        .addNumberOption(option =>
+            option.setName('price')
+                .setDescription('New price for the product')
+                .setRequired(false)
+        )
         .toJSON()
 ];
 
@@ -95,7 +124,11 @@ const rest = new REST({ version: '10' }).setToken(token);
 
         console.log('Started refreshing application (/) commands.');
 
-        await rest.put(Routes.applicationCommands(clientId), { body: commands });
+        await rest.put(Routes.applicationCommands(clientId, guildId), { body: [] });
+
+        console.log('Successfully deleted all application (/) commands.');
+
+        await rest.put(Routes.applicationCommands(clientId, guildId), { body: commands });
 
         console.log('Successfully reloaded application (/) commands.');
 
@@ -103,4 +136,3 @@ const rest = new REST({ version: '10' }).setToken(token);
         console.error(error);
     }
 })();
-
