@@ -15,7 +15,7 @@ economy.prepare(`
   )
 `).run();
 
-// Stores user shop data (not implemented yet)
+// Stores user shop data 
 economy.prepare(`
   CREATE TABLE IF NOT EXISTS shops (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -26,25 +26,31 @@ economy.prepare(`
   )
 `).run();
 
+// Stores statistics
+economy.prepare(`
+  CREATE TABLE IF NOT EXISTS statistics (
+      id INTEGER PRIMARY KEY CHECK (id = 1), 
+      money_transferred INTEGER DEFAULT 0,
+      purchases INTEGER DEFAULT 0
+  )
+`).run();
+
+economy.prepare(`INSERT OR IGNORE INTO statistics (id) VALUES (?)`).run(1);
+
 
 // General discord bot setup (annoying)
 
 function value(amount) {
-
   return (amount === 1) ? 'token' : 'tokens';
-
 }
 
 let activities = [
-
-  "Wait... this is monopoly money?"
-
+  "Wait... this is monopoly money?",
+  "Is this capitalism?"
 ];
 
 const client = new Client({
-
   intents: [GatewayIntentBits.Guilds]
-
 });
 
 client.on(Events.InteractionCreate, async interaction => {
@@ -94,10 +100,14 @@ client.on(Events.InteractionCreate, async interaction => {
         economy.prepare('UPDATE users SET balance = balance - ? WHERE user_id = ?').run(amount, userId);
         economy.prepare('UPDATE users SET balance = balance + ? WHERE user_id = ?').run(amount, recipient);
 
+        economy.prepare(`UPDATE statistics SET money_transferred = money_transferred + ? WHERE id = 1`).run(amount);
+
+
         let embed = new EmbedBuilder()
           .setDescription(`:white_check_mark: Paid user <@${recipient}> **${amount}** ${value(amount)}.`)
 
         await interaction.reply({ embeds: [embed] });
+
 
       } else {
         let embed = new EmbedBuilder()
@@ -236,6 +246,9 @@ client.on(Events.InteractionCreate, async interaction => {
         economy.prepare('UPDATE users SET balance = balance - ? WHERE user_id = ?').run(product.price, userId);
         economy.prepare('UPDATE users SET balance = balance + ? WHERE user_id = ?').run(product.price, targetUserShop);
 
+        economy.prepare(`UPDATE statistics SET money_transferred = money_transferred + ? WHERE id = 1`).run(product.price);
+        economy.prepare(`UPDATE statistics SET purchases = purchases + 1 WHERE id = 1`).run();
+
 
         let success = false;
 
@@ -322,6 +335,18 @@ client.on(Events.InteractionCreate, async interaction => {
       await interaction.reply({ embeds: [embed] });
 
     }
+  } else if (commandName === 'statistics') {
+
+    let stats = economy.prepare(`SELECT * FROM statistics WHERE id = 1`).get();
+
+    let text = `**${stats.money_transferred}** total tokens transferred \n\n**${stats.purchases}** total purchases`;
+
+    let embed = new EmbedBuilder()
+              .setTitle('Statistics')
+              .setDescription(text)
+              .setTimestamp()
+
+    await interaction.reply({ embeds: [embed]} )
   }
 
 });
@@ -341,4 +366,3 @@ client.once(Events.ClientReady, readyClient => {
 });
 
 client.login(token);
-
