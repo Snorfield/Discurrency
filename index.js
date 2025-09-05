@@ -30,15 +30,21 @@ economy.prepare(`
 // General discord bot setup (annoying)
 
 function value(amount) {
+
   return (amount === 1) ? 'token' : 'tokens';
+
 }
 
 let activities = [
+
   "Wait... this is monopoly money?"
+
 ];
 
 const client = new Client({
+
   intents: [GatewayIntentBits.Guilds]
+
 });
 
 client.on(Events.InteractionCreate, async interaction => {
@@ -214,7 +220,9 @@ client.on(Events.InteractionCreate, async interaction => {
 
     let balance = economy.prepare('SELECT balance FROM users WHERE user_id = ?').get(userId).balance;
 
+    let targetUser = interaction.options.getUser('user');
     let targetUserShop = interaction.options.getUser('user').id;
+    let targetUserName = targetUser.username;
 
     let targetShopId = interaction.options.getNumber('id');
 
@@ -227,10 +235,30 @@ client.on(Events.InteractionCreate, async interaction => {
         economy.prepare('UPDATE users SET balance = balance - ? WHERE user_id = ?').run(product.price, userId);
         economy.prepare('UPDATE users SET balance = balance + ? WHERE user_id = ?').run(product.price, targetUserShop);
 
-        let embed = new EmbedBuilder()
+
+        let success = false;
+
+        let buyerEmbed = new EmbedBuilder()
           .setDescription(`:white_check_mark: Your purchase of **${product.service}** from <@${targetUserShop}> has gone through successfully.`)
 
-        await interaction.reply({ content: `<@${targetUserShop}>`, embeds: [embed] });
+
+        let sellerEmbed = new EmbedBuilder()
+          .setDescription(`<@${userId}> (${targetUserName}) has purchased **${product.service}** from you. **+${product.price}** ${value(product.price)}`);
+
+        await interaction.deferReply();
+
+        try {
+          await targetUser.send({ embeds: [sellerEmbed] });
+          success = true;
+        } catch (e) {
+          success = false;
+        }
+
+        if (success) {
+          await interaction.editReply({ embeds: [buyerEmbed] });
+        } else {
+          await interaction.editReply({ content: `<@${targetUserShop}>`, embeds: [buyerEmbed] });
+        }
 
       } else {
 
@@ -294,17 +322,21 @@ client.on(Events.InteractionCreate, async interaction => {
 
     }
   }
+
 });
 
 
 client.once(Events.ClientReady, readyClient => {
+
   console.log(`Ready on ${readyClient.user.tag}`);
+
   client.user.setPresence({
+
     activities: [{ name: activities[Math.floor(Math.random() * activities.length)], type: 4 }],
     status: 'online',
+
   });
+
 });
 
 client.login(token);
-
-
