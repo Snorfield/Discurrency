@@ -156,14 +156,14 @@ client.on(Events.InteractionCreate, async interaction => {
   } else if (commandName === 'create-product') {
 
     let userId = interaction.user.id;
-    
+
     economy.prepare('INSERT OR IGNORE INTO users (user_id, balance) VALUES (?, 100)').run(userId);
 
     let userShops = economy.prepare('SELECT * FROM shops WHERE user_id = ?').all(userId);
 
-    if (userShops.length >= 8) {
+    if (userShops.length >= 4) {
       let embed = new EmbedBuilder()
-        .setDescription(":x: You have the limit of eight products in your shop, please remove some to add this product.")
+        .setDescription(":x: You have the limit of four products in your shop, please remove some to add this product.")
 
       await interaction.reply({ embeds: [embed] });
 
@@ -247,6 +247,52 @@ client.on(Events.InteractionCreate, async interaction => {
 
       await interaction.reply({ embeds: [embed] });
     }
+  } else if (commandName === 'edit-product') {
+
+
+    let productId = interaction.options.getNumber('id');
+    let userId = interaction.user.id;
+
+    let productData = economy.prepare('SELECT * FROM shops WHERE id = ? AND user_id = ?').get(productId, userId);
+
+    if (productData) {
+
+      let product = interaction.options.getString('product');
+      let description = interaction.options.getString('description');
+      let price = interaction.options.getNumber('price');
+
+      if (!product) {
+        product = productData.service;
+      }
+
+      if (!description) {
+        description = productData.description;
+      }
+
+      if (price === null || price === undefined) {
+        price = productData.price;
+      } else {
+        price = Math.abs(price);
+      }
+
+      economy.prepare('UPDATE shops SET service = ?, description = ?, price = ? WHERE id = ?').run(product, description, price, productId);
+
+      let text = `**${product}**\n*${price} ${value(price)}*\n${description}`;
+
+      let embed = new EmbedBuilder()
+        .setTitle(`:white_check_mark: Product Successfully Edited`)
+        .setDescription(text)
+        .setTimestamp()
+
+      await interaction.reply({ embeds: [embed] });
+
+    } else {
+      let embed = new EmbedBuilder()
+        .setDescription(":x: Could not find the item you want to edit.")
+
+      await interaction.reply({ embeds: [embed] });
+
+    }
   }
 });
 
@@ -260,5 +306,4 @@ client.once(Events.ClientReady, readyClient => {
 });
 
 client.login(token);
-
 
