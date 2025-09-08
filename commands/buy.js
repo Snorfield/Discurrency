@@ -4,6 +4,8 @@ const withPlural = require('../utils.js')
 
 async function buy(interaction) {
 
+    let client = interaction.client;
+
     let userId = interaction.user.id;
     let userScreenName = interaction.user.username;
 
@@ -12,13 +14,29 @@ async function buy(interaction) {
     let userBalance = economy.prepare('SELECT balance FROM users WHERE user_id = ?').get(userId).balance;
 
     let shopOwner = interaction.options.getUser('user');
-    let shopOwnerId = interaction.options.getUser('user').id;
+
+    let shopOwnerId;
 
     let productId = interaction.options.getNumber('id');
 
-    let productObject = economy.prepare('SELECT * FROM shops WHERE id = ? AND user_id = ?').get(productId, shopOwnerId);
+    let productObject;
+
+    if (shopOwner) {
+
+        shopOwnerId = shopOwner.id;
+
+        productObject = economy.prepare('SELECT * FROM shops WHERE id = ? AND user_id = ?').get(productId, shopOwnerId);
+
+    } else {
+
+        productObject = economy.prepare('SELECT * FROM shops WHERE id = ?').get(productId);
+
+    }
 
     if (productObject) {
+
+        shopOwner = (await client.users.fetch(productObject.user_id));
+        shopOwnerId = shopOwner.id;
 
         if (userBalance >= productObject.price) {
 
@@ -62,7 +80,7 @@ async function buy(interaction) {
 
     } else {
         let embed = new EmbedBuilder()
-            .setDescription(":x: Either this user doesn't have any products, or they don't have one with that id.")
+            .setDescription(":x: Could not find product with that id.")
 
         await interaction.reply({ embeds: [embed] });
     }

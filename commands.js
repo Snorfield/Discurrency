@@ -7,7 +7,7 @@ const commands = [
         .setName('balance')
         .setDescription('Get your current balance')
         .toJSON(),
-    
+
     new SlashCommandBuilder()
         .setName('statistics')
         .setDescription('View the statistics of the economy')
@@ -49,15 +49,15 @@ const commands = [
         .addStringOption(option =>
             option.setName('product')
                 .setDescription('Name of the product')
-                .setMaxLength(200) 
-                .setMinLength(1) 
+                .setMaxLength(200)
+                .setMinLength(1)
                 .setRequired(true)
         )
         .addStringOption(option =>
             option.setName('description')
                 .setDescription('Description for the product')
-                .setMaxLength(200) 
-                .setMinLength(1) 
+                .setMaxLength(200)
+                .setMinLength(1)
                 .setRequired(true)
         )
         .addNumberOption(option =>
@@ -80,15 +80,15 @@ const commands = [
     new SlashCommandBuilder()
         .setName('buy')
         .setDescription('Buy a product from a user\'s shop')
-        .addUserOption(option =>
-            option.setName('user')
-                .setDescription('User shop to buy from')
-                .setRequired(true)
-        )
         .addNumberOption(option =>
             option.setName('id')
                 .setDescription('ID of product to buy')
                 .setRequired(true)
+        )
+        .addUserOption(option =>
+            option.setName('user')
+                .setDescription('User shop to buy from')
+                .setRequired(false)
         )
         .toJSON(),
 
@@ -103,15 +103,15 @@ const commands = [
         .addStringOption(option =>
             option.setName('product')
                 .setDescription('New name of the product')
-                .setMaxLength(200) 
-                .setMinLength(1) 
+                .setMaxLength(200)
+                .setMinLength(1)
                 .setRequired(false)
         )
         .addStringOption(option =>
             option.setName('description')
                 .setDescription('New description for the product')
-                .setMaxLength(200) 
-                .setMinLength(1) 
+                .setMaxLength(200)
+                .setMinLength(1)
                 .setRequired(false)
         )
         .addNumberOption(option =>
@@ -120,7 +120,7 @@ const commands = [
                 .setRequired(false)
         )
         .toJSON()
-        
+
 ];
 
 const rest = new REST({ version: '10' }).setToken(token);
